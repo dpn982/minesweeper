@@ -19,13 +19,17 @@ class Board extends StatefulWidget {
   void reset() {
     _boardState.reset();
   }
+
+  int getRemainingCells() {
+    return _boardState.getRemainingCells();
+  }
 }
 
 class _BoardState extends State<Board> {
   List<List<Cell>> _board = new List<List<Cell>>();
   List<Cell> _bombs = new List<Cell>();
   Random _random = new Random();
-  int _squaresRemaining = 0;
+  int _cellsRemaining = 0;
 
   void reset() {
     setState(() {
@@ -33,8 +37,12 @@ class _BoardState extends State<Board> {
     });
   }
 
+  int getRemainingCells() {
+    return _cellsRemaining;
+  }
+
   void _initializeBoard() {
-    _squaresRemaining = widget.columnCount * widget.rowCount;
+    _cellsRemaining = widget.columnCount * widget.rowCount;
 
     _board = List.generate(widget.rowCount, (i) {
       return List.generate(widget.columnCount, (j) {
@@ -153,7 +161,7 @@ class _BoardState extends State<Board> {
     if (!cell.isFlagged() && !cell.isFlipped()) {
       setState(() {
         cell.flip();
-        _squaresRemaining--;
+        _cellsRemaining--;
       });
     }
   }
