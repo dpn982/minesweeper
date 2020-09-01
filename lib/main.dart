@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:minesweeper/widgets/board.dart';
 
@@ -29,7 +30,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Board _board = Board(rowCount: 8, columnCount: 8, bombs: 10,);
+  Board _board = Board(
+    rowCount: 8,
+    columnCount: 8,
+    bombs: 10,
+  );
 
   void _resetBoard(BuildContext context) {
     _board.reset();
@@ -41,8 +46,30 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: _board,
+      body: Container(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(12.0),
+                    decoration: BoxDecoration(border: Border.all(width: 4),),
+                    child: Text("Running", style: TextStyle(color: Colors.green, fontSize: 30,),),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(12.0),
+                    decoration: BoxDecoration(border: Border.all(width: 4)),
+                    child: Text("10 Squares Left", style: TextStyle(color: Colors.green, fontSize: 30,),),
+                  ),
+                ],
+              ),
+            ),
+            _board,
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _resetBoard(context),

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:minesweeper/models/cell.dart';
 import 'dart:math';
 
+import 'package:minesweeper/models/player_state.dart';
+
 class Board extends StatefulWidget {
   final rowCount;
   final columnCount;
@@ -20,8 +22,8 @@ class Board extends StatefulWidget {
     _boardState.reset();
   }
 
-  int getRemainingCells() {
-    return _boardState.getRemainingCells();
+  PlayerState getPlayerState() {
+    return _boardState.getPlayerState();
   }
 }
 
@@ -29,7 +31,8 @@ class _BoardState extends State<Board> {
   List<List<Cell>> _board = new List<List<Cell>>();
   List<Cell> _bombs = new List<Cell>();
   Random _random = new Random();
-  int _cellsRemaining = 0;
+  PlayerState _playerState;
+  //int _cellsRemaining = 0;
 
   void reset() {
     setState(() {
@@ -37,12 +40,13 @@ class _BoardState extends State<Board> {
     });
   }
 
-  int getRemainingCells() {
-    return _cellsRemaining;
+  PlayerState getPlayerState() {
+    return _playerState;
   }
 
   void _initializeBoard() {
-    _cellsRemaining = widget.columnCount * widget.rowCount;
+    _playerState = new PlayerState();
+    _playerState.cellsRemaining = widget.columnCount * widget.rowCount;
 
     _board = List.generate(widget.rowCount, (i) {
       return List.generate(widget.columnCount, (j) {
@@ -161,7 +165,7 @@ class _BoardState extends State<Board> {
     if (!cell.isFlagged() && !cell.isFlipped()) {
       setState(() {
         cell.flip();
-        _cellsRemaining--;
+        _playerState.cellsRemaining--;
       });
     }
   }
