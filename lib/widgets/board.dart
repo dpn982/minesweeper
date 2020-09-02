@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:minesweeper/models/cell.dart';
+import 'package:minesweeper/models/game_state.dart';
 import 'dart:math';
 
 import 'package:minesweeper/models/player_state.dart';
@@ -32,7 +33,6 @@ class _BoardState extends State<Board> {
   List<Cell> _bombs = new List<Cell>();
   Random _random = new Random();
   PlayerState _playerState;
-  //int _cellsRemaining = 0;
 
   void reset() {
     setState(() {
@@ -46,7 +46,8 @@ class _BoardState extends State<Board> {
 
   void _initializeBoard() {
     _playerState = new PlayerState();
-    _playerState.cellsRemaining = widget.columnCount * widget.rowCount;
+    _playerState.state = GameState.RUNNING;
+    _playerState.cellsRemaining = (widget.columnCount * widget.rowCount) - widget.bombs;
 
     _board = List.generate(widget.rowCount, (i) {
       return List.generate(widget.columnCount, (j) {
@@ -86,20 +87,29 @@ class _BoardState extends State<Board> {
   }
 
   void _gridItemTapped(int x, int y) {
-    print("Row: $y, Column: $x");
-
     setState(() {
-      if (_board[y][x].isBlank()) {
-        _board[y][x].flip();
-        _flipAdjacentBlankCells(_board[y][x]);
-      } else {
-        _board[y][x].flip();
+      if (_playerState.cellsRemaining > 0) {
+        if (_board[y][x].isBlank()) {
+          _board[y][x].flip();
+          _flipAdjacentBlankCells(_board[y][x]);
+        }
+        else if (_board[y][x].isBomb()) {
+          for (Cell c in _bombs) {
+            _board[c.getRow()][c.getColumn()].flip(flipFlagged: true,);
+          }
+          _playerState.state = GameState.LOSE;
+        }
+        else {
+          _board[y][x].flip();
+        }
+      }
+      else {
+        _playerState.state = GameState.WIN;
       }
     });
   }
 
   void _gridItemLongTapped(int x, int y) {
-    print("Long Press - Row: $y, Column: $x");
     setState(() {
       _board[y][x].flag();
     });
@@ -111,6 +121,7 @@ class _BoardState extends State<Board> {
     if (_cell.isFlagged()) {
       return Container(
         color: Colors.green,
+        child: Icon(Icons.flag),
       );
     } else if (_cell.isFlipped()) {
       if (_cell.isBomb()) {
@@ -147,8 +158,8 @@ class _BoardState extends State<Board> {
     x = (index / gridStateLength).floor();
     y = (index % gridStateLength);
     return GestureDetector(
-      onTap: () => _gridItemTapped(x, y),
-      onDoubleTap: () => _gridItemLongTapped(x, y),
+      onTap: (_playerState.state == GameState.RUNNING) ? () => _gridItemTapped(x, y) : null,
+      onDoubleTap: (_playerState.state == GameState.RUNNING) ? () => _gridItemLongTapped(x, y) : null,
       child: GridTile(
         child: Container(
           decoration: BoxDecoration(

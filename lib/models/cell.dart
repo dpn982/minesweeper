@@ -19,8 +19,8 @@ class Cell {
   bool isFlagged() => _isFlagged;
   bool isBlank() => (_adjacentBombs == 0);
   
-  void flip() {
-    if (!_isFlagged && !_isFlipped) {
+  void flip({bool flipFlagged : false}) {
+    if ((!_isFlagged && !_isFlipped) || flipFlagged) {
       _isFlipped = true;
     }
   }
